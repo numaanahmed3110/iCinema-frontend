@@ -17,13 +17,7 @@ import MovieCard from "../components/MovieCard";
 import MovieFilterBar from "../components/MovieFilterBar";
 import Footer from "../components/Footer";
 import { buildUrl, API_CONFIG, APP_CONFIG } from "../config";
-import {
-  LOADING_MESSAGES,
-  ERROR_MESSAGES,
-  EMPTY_MESSAGES,
-  BUTTON_LABELS,
-  INFO_MESSAGES,
-} from "../constants";
+import { ERROR_MESSAGES } from "../constants";
 
 const MoviesPage = () => {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -47,6 +41,7 @@ const MoviesPage = () => {
 
   useEffect(() => {
     fetchMovies();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchMovies = () => {

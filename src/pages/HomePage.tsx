@@ -16,12 +16,7 @@ import MovieCarousel from "../components/MovieCarousel";
 import MovieCard from "../components/MovieCard";
 import Footer from "../components/Footer";
 import { buildUrl, API_CONFIG } from "../config";
-import {
-  LOADING_MESSAGES,
-  ERROR_MESSAGES,
-  BUTTON_LABELS,
-  SECTION_TITLES,
-} from "../constants";
+import { ERROR_MESSAGES } from "../constants";
 
 const HomePage = () => {
   const [movies, setMovies] = useState<Movie[]>([]);

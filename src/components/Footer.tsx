@@ -45,16 +45,17 @@ const Footer = () => {
               </p>
               <div className="d-flex gap-3 mt-4">
                 {["📘", "🐦", "📷", "📺"].map((icon, idx) => (
-                  <a
+                  <button
                     key={idx}
-                    href="#"
-                    className="d-flex align-items-center justify-content-center rounded-circle"
+                    type="button"
+                    className="d-flex align-items-center justify-content-center rounded-circle border-0"
                     style={{
                       width: "40px",
                       height: "40px",
                       background: "rgba(255,255,255,0.1)",
                       fontSize: "18px",
                       transition: "all 0.2s ease",
+                      cursor: "pointer",
                     }}
                     onMouseEnter={(e) => {
                       e.currentTarget.style.background = "rgba(229,9,20,0.3)";
@@ -67,7 +68,7 @@ const Footer = () => {
                     }}
                   >
                     {icon}
-                  </a>
+                  </button>
                 ))}
               </div>
             </div>
@@ -118,8 +119,9 @@ const Footer = () => {
               {["FAQs", "Terms of Service", "Privacy Policy", "Contact Us"].map(
                 (item, idx) => (
                   <li key={idx} className="mb-3">
-                    <a
-                      href="#"
+                    <button
+                      type="button"
+                      className="border-0 bg-transparent p-0"
                       style={linkStyle}
                       onMouseEnter={(e) =>
                         (e.currentTarget.style.color = "#e50914")
@@ -129,7 +131,7 @@ const Footer = () => {
                       }
                     >
                       {item}
-                    </a>
+                    </button>
                   </li>
                 ),
               )}
