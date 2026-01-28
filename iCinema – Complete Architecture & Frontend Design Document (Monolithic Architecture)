@@ -1,0 +1,285 @@
+## iCinema – Complete Architecture & Frontend Design Document (Monolithic Architecture)
+
+---
+
+# 1. Project Overview
+
+**iCinema** is a web-based movie ticket booking platform where users can browse movies, filter/search movies, view movie details, select theatres and shows, choose seats, calculate booking price dynamically, perform mock payment, and view booking confirmation.
+
+This document explains:
+
+- Database Schema Architecture
+- Backend Monolithic Architecture & Workflow
+- API Design Mapping to UI
+- Frontend Architecture & UI Design
+- User Story Coverage (US-01 to US-10)
+- System Workflow (End-to-End)
+
+This document is written so a junior developer can implement the frontend without guessing.
+
+---
+
+# 2. System Architecture (Monolithic)
+
+### 2.1 High-Level Architecture
+
+The system follows **Monolithic Architecture** where all modules are deployed as a single Spring Boot application.
+
+### Layers:
+
+1. **Controller Layer** – REST APIs
+2. **Service Layer** – Business Logic
+3. **Repository Layer** – Database interaction (JPA)
+4. **Entity Layer** – Database models
+5. **DTO Layer** – API request/response contracts
+6. **Database (MySQL)**
+
+Frontend is a **React/Angular SPA** consuming REST APIs.
+
+---
+
+# 3. Database Schema Architecture
+
+## 3.1 Core Entities
+
+### **User**
+
+| Field    | Type   | Description        |
+| -------- | ------ | ------------------ |
+| id       | Long   | Primary Key        |
+| name     | String | User Name          |
+| email    | String | Login Email        |
+| password | String | Encrypted Password |
+| role     | String | USER / ADMIN       |
+
+Relationships:
+
+- One User → Many Bookings
+- One User → Many Ratings
+
+---
+
+### **Movie**
+
+| Field         | Type      | Description       |
+| ------------- | --------- | ----------------- |
+| id            | Long      | Primary Key       |
+| name          | String    | Movie Name        |
+| genre         | String    | Action/Comedy/etc |
+| language      | String    | English/Hindi/etc |
+| imageUrl      | String    | Poster URL        |
+| releaseDate   | LocalDate | Release Date      |
+| averageRating | Double    | Avg Rating        |
+| censorRating  | String    | U/A, A            |
+| description   | String    | Movie Description |
+
+Relationships:
+
+- One Movie → Many Shows
+- One Movie → Many Ratings
+
+---
+
+### **Theatre**
+
+| Field    | Type   |
+| -------- | ------ |
+| id       | Long   |
+| name     | String |
+| location | String |
+
+Relationships:
+
+- One Theatre → Many Screens
+- One Theatre → Many Shows
+
+---
+
+### **Screen**
+
+| Field      | Type   |
+| ---------- | ------ |
+| id         | Long   |
+| screenName | String |
+| totalSeats | int    |
+
+Relationships:
+
+- One Screen → Many Seats
+- One Screen → Many Shows
+
+---
+
+### **Seat**
+
+| Field      | Type                      |
+| ---------- | ------------------------- |
+| id         | Long                      |
+| seatNumber | String (A1, B1)           |
+| seatType   | String (REGULAR, PREMIUM) |
+
+Relationships:
+
+- One Seat → Many ShowSeats
+
+---
+
+### **Show**
+
+| Field    | Type          |
+| -------- | ------------- |
+| id       | Long          |
+| showTime | LocalDateTime |
+| price    | Double        |
+
+Relationships:
+
+- Many Shows → One Movie
+- Many Shows → One Theatre
+- Many Shows → One Screen
+
+---
+
+### **ShowSeat**
+
+Represents seat status per show.
+
+| Field  | Type                               |
+| ------ | ---------------------------------- |
+| id     | Long                               |
+| status | ENUM (AVAILABLE, BOOKED, SELECTED) |
+
+Relationships:
+
+- Many ShowSeats → One Show
+- Many ShowSeats → One Seat
+
+---
+
+### **Booking**
+
+| Field          | Type                              |
+| -------------- | --------------------------------- |
+| id             | Long                              |
+| seatPriceTotal | Double                            |
+| convenienceFee | Double                            |
+| gst            | Double                            |
+| totalAmount    | Double                            |
+| status         | ENUM (PENDING, CONFIRMED, FAILED) |
+
+Relationships:
+
+- Many Bookings → One User
+- Many Bookings → One Show
+
+---
+
+### **BookingSeat**
+
+Maps booked seats.
+
+| Field | Type |
+| ----- | ---- |
+| id    | Long |
+
+Relationships:
+
+- Many BookingSeats → One Booking
+- Many BookingSeats → One Seat
+
+---
+
+### **Payment**
+
+| Field  | Type                   |
+| ------ | ---------------------- |
+| id     | Long                   |
+| method | ENUM (CREDIT, DEBIT)   |
+| amount | Double                 |
+| status | ENUM (SUCCESS, FAILED) |
+
+Relationships:
+
+- One Payment → One Booking
+
+---
+
+### **Rating**
+
+| Field    | Type      |
+| -------- | --------- |
+| ratingId | Long      |
+| stars    | int (1–5) |
+
+Relationships:
+
+- Many Ratings → One User
+- Many Ratings → One Movie
+
+---
+
+# 4. Backend API Architecture
+
+## 4.1 Movie APIs
+
+| Endpoint                                | Method | Description       |
+| --------------------------------------- | ------ | ----------------- |
+| /movies/allMovies                       | GET    | Get all movies    |
+| /movies/{id}                            | GET    | Get movie details |
+| /movies/search?name=                    | GET    | Search movie      |
+| /movies/filter?genre=&language=&rating= | GET    | Filter movies     |
+
+---
+
+## 4.2 Seating APIs
+
+| Endpoint                                  | Method | Description        |
+| ----------------------------------------- | ------ | ------------------ |
+| /api/seating/movie/{movieId}              | GET    | Theatres + Shows   |
+| /api/seating/show/{showId}/pricing?seats= | GET    | Pricing Validation |
+| /api/seating/show/{showId}/seats          | GET    | Seat Layout        |
+
+---
+
+## 4.3 Booking API
+
+| Endpoint                            | Method | Description     |
+| ----------------------------------- | ------ | --------------- |
+| /api/booking/summary?showId=&seats= | GET    | Booking Summary |
+
+---
+
+## 4.4 Payment API
+
+| Endpoint         | Method | Description  |
+| ---------------- | ------ | ------------ |
+| /api/payment/pay | POST   | Make Payment |
+
+---
+
+## 4.5 Rating API
+
+| Endpoint         | Method | Description |
+| ---------------- | ------ | ----------- |
+| /api/rating/rate | POST   | Rate Movie  |
+
+---
+
+# 5. Frontend Design Documentation Reference
+
+The frontend architecture, UI/UX design, Bootstrap layout, TSX component structure, and beginner implementation guidelines have been **moved to a separate document** titled:
+
+**"iCinema Frontend Architecture & UI Design Document"**
+
+This backend document now focuses only on:
+
+- Database Schema Architecture
+- Backend Monolithic Architecture
+- API Contracts
+- System Workflow Mapping
+
+Refer to the frontend document for UI implementation details.
+
+---
+
+# END OF DOCUMENT

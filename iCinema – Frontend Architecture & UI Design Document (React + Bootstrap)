@@ -1,0 +1,248 @@
+## iCinema – Frontend Architecture & UI Design Document (React + Bootstrap)
+
+---
+
+# 1. Frontend Overview
+
+This document defines the **frontend architecture, UI layout, and implementation plan** for the iCinema project using:
+
+- React + TypeScript (TSX)
+- Bootstrap & React-Bootstrap
+- Axios for API calls
+- React Router DOM for routing
+
+No authentication, no Redux/Zustand, no custom CSS files, and no extra libraries are used.
+
+---
+
+# 2. Frontend Folder Structure (BEGINNER LEVEL)
+
+```
+src/
+  components/
+    Navbar.tsx
+    MovieCard.tsx
+    MovieCarousel.tsx
+    MovieFilterBar.tsx
+    SeatGrid.tsx
+    BookingSummary.tsx
+    PaymentForm.tsx
+
+  models/
+    Movie.ts
+    Show.ts
+    Seat.ts
+    BookingSummary.ts
+    Payment.ts
+
+  pages/
+    HomePage.tsx
+    MoviesPage.tsx
+    MovieDetailsPage.tsx
+    ShowSelectionPage.tsx
+    SeatSelectionPage.tsx
+    BookingSummaryPage.tsx
+    PaymentPage.tsx
+    TicketPage.tsx
+
+  App.tsx
+  main.tsx
+```
+
+---
+
+# 3. UI Design Philosophy
+
+## 3.1 Design References
+
+- **Booking Flow, Show Selection, Seat Matrix** → Inspired by BookMyShow (industry standard UX)
+- **Home Page & Movies Page** → Unique Netflix/Amazon-style grid layout
+
+## 3.2 Styling Rules
+
+- Only Bootstrap classes (`container`, `row`, `col`, `card`, `carousel`, etc.)
+- No CSS files
+- No Tailwind, Material UI, or external UI frameworks
+
+---
+
+# 4. Page-Level UI Design
+
+## 4.1 Home Page (/)
+
+### Unique UI Design
+
+- Dark theme hero carousel (Netflix-style)
+- Horizontal trending movies row
+- Info feature cards
+
+### Bootstrap Layout
+
+```
+<Container fluid>
+  <Navbar />
+  <Carousel />
+  <Container>
+    <Row><h3>Trending Movies</h3></Row>
+    <Row className="d-flex flex-row flex-nowrap overflow-auto"><MovieCard /></Row>
+    <Row className="mt-4">
+      <Col md={4}><Card>Easy Booking</Card></Col>
+      <Col md={4}><Card>Secure Payment</Card></Col>
+      <Col md={4}><Card>Real-time Seats</Card></Col>
+    </Row>
+    <Row className="mt-4"><h3>Currently Playing</h3></Row>
+    <Row><Col md={3}><MovieCard /></Col></Row>
+  </Container>
+</Container>
+```
+
+---
+
+## 4.2 Movies Page (/movies)
+
+### Unique Design (NOT BookMyShow clone)
+
+- Left filter sidebar
+- Right movie grid explorer
+
+### Layout
+
+```
+<Row>
+  <Col md={3}><Accordion>Filters</Accordion></Col>
+  <Col md={9}>
+    <Form.Control placeholder="Search Movies" />
+    <Row className="mt-3"><Col md={3}><MovieCard /></Col></Row>
+  </Col>
+</Row>
+```
+
+Features:
+
+- Pagination (20 movies per page)
+- Filters: Genre, Language, Rating
+- Search using backend API
+
+---
+
+## 4.3 Movie Details Page (/movies/:id)
+
+Displays:
+
+- Poster, Name, Genre, Language, Rating, Release Date, Description
+- Rating Input Box (1–5 stars)
+- Book My Show Button
+
+---
+
+## 4.4 Show Selection Page (/shows/:movieId)
+
+- List of theatres and show times
+- Clicking show → seat count page
+
+---
+
+## 4.5 Seat Count & Pricing Page
+
+- Input number of seats
+- Call pricing API
+- Show total estimated cost
+
+---
+
+## 4.6 Seat Selection Page (/seats/:showId)
+
+### BookMyShow-Style UX
+
+- Seat grid (A1, A2, B1...)
+- Colors:
+  - Green = Available
+  - Red = Booked
+  - Yellow = Selected
+
+### Layout
+
+```
+<Row>
+  <Col md={9}><SeatGrid /></Col>
+  <Col md={3}><BookingSummary /></Col>
+</Row>
+```
+
+---
+
+## 4.7 Booking Summary Page
+
+- Seat price
+- Convenience fee
+- GST
+- Total amount
+- Pay Now button
+
+---
+
+## 4.8 Payment Page
+
+### Mock Payment UI
+
+- Credit / Debit card selection
+- Card Number, Expiry, CVV fields
+- Discounts:
+  - Credit Card → 10%
+  - Debit Card → 5%
+
+---
+
+## 4.9 Ticket Confirmation Page
+
+Displays final ticket details:
+
+- Movie Name
+- Seats
+- Theatre
+- Show Time
+- Amount Paid
+
+---
+
+# 5. API Integration Pattern (BEGINNER STYLE)
+
+### Example Axios Call
+
+```
+useEffect(() => {
+  axios.get("http://localhost:8080/movies/allMovies")
+    .then(res => setMovies(res.data));
+}, []);
+```
+
+### Example POST Payment
+
+```
+const handlePay = () => {
+  axios.post("http://localhost:8080/api/payment/pay", paymentData)
+    .then(res => setResult(res.data));
+};
+```
+
+---
+
+# 6. Beginner React State Rules
+
+- Use useState for movies, seats, selectedSeats, totalPrice
+- Pass props between components
+- No Redux/Zustand/Context global state
+
+---
+
+# 7. Notes for Junior Developer
+
+- Do not add CSS files
+- Do not add service folders
+- Do not add DTO folders in frontend
+- Write axios directly in components
+- Keep components simple and readable
+
+---
+
+# END OF FRONTEND DOCUMENT
