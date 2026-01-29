@@ -80,9 +80,12 @@ const SeatSelectionPage = () => {
 
   const fetchSeatLayout = () => {
     setLoading(true);
+    const token = localStorage.getItem("token");
 
     axios
-      .get(`http://localhost:8080/api/seating/show/${showId}/seats`)
+      .get(`http://localhost:8080/api/seating/show/${showId}/seats`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
       .then((res) => {
         // Transform API response to SeatRow format if needed
         const data = res.data;
@@ -146,10 +149,14 @@ const SeatSelectionPage = () => {
     }
 
     const seatIds = selectedSeats.map((s) => s.id).join(",");
+    const token = localStorage.getItem("token");
 
     axios
       .get(
         `http://localhost:8080/api/seating/show/${showId}/pricing?seats=${seatIds}`,
+        {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        },
       )
       .then((res) => {
         setPricing({

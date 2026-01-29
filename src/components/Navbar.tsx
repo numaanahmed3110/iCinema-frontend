@@ -1,8 +1,35 @@
-import { Link, useLocation } from "react-router-dom";
-import { Container, Navbar as BSNavbar, Nav } from "react-bootstrap";
+import { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Container, Navbar as BSNavbar, Nav, Button } from "react-bootstrap";
 
 const Navbar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userName, setUserName] = useState("");
+
+  // Check login status on mount and when location changes
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
+    setIsLoggedIn(!!token);
+    if (user) {
+      try {
+        const userData = JSON.parse(user);
+        setUserName(userData.name || userData.email || "User");
+      } catch {
+        setUserName("User");
+      }
+    }
+  }, [location]);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setIsLoggedIn(false);
+    setUserName("");
+    navigate("/");
+  };
 
   return (
     <BSNavbar
@@ -49,46 +76,161 @@ const Navbar = () => {
           <span style={{ color: "#e50914", fontSize: "24px" }}>☰</span>
         </BSNavbar.Toggle>
         <BSNavbar.Collapse id="navbar-nav">
-          <Nav className="ms-auto gap-2">
+          {/* Center Navigation Links */}
+          <Nav className="mx-auto gap-4 align-items-center">
             <Nav.Link
               as={Link}
               to="/"
-              className="px-3 py-2 rounded-pill fw-semibold"
+              className="px-2 py-2 position-relative"
               style={{
-                color:
-                  location.pathname === "/" ? "#fff" : "rgba(255,255,255,0.7)",
-                background:
-                  location.pathname === "/"
-                    ? "rgba(229,9,20,0.3)"
-                    : "transparent",
-                border:
-                  location.pathname === "/"
-                    ? "1px solid rgba(229,9,20,0.5)"
-                    : "1px solid transparent",
+                color: "#fff",
+                fontWeight: 500,
+                fontSize: "15px",
+                letterSpacing: "0.3px",
                 transition: "all 0.3s ease",
+                background: "transparent",
+                border: "none",
               }}
             >
-              🏠 Home
+              Home
+              {location.pathname === "/" && (
+                <span
+                  style={{
+                    position: "absolute",
+                    bottom: "0",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    width: "20px",
+                    height: "2px",
+                    background: "#e50914",
+                    borderRadius: "2px",
+                  }}
+                />
+              )}
             </Nav.Link>
             <Nav.Link
               as={Link}
               to="/movies"
-              className="px-3 py-2 rounded-pill fw-semibold"
+              className="px-2 py-2 position-relative"
               style={{
-                color: location.pathname.startsWith("/movies")
-                  ? "#fff"
-                  : "rgba(255,255,255,0.7)",
-                background: location.pathname.startsWith("/movies")
-                  ? "rgba(229,9,20,0.3)"
-                  : "transparent",
-                border: location.pathname.startsWith("/movies")
-                  ? "1px solid rgba(229,9,20,0.5)"
-                  : "1px solid transparent",
+                color: "#fff",
+                fontWeight: 500,
+                fontSize: "15px",
+                letterSpacing: "0.3px",
                 transition: "all 0.3s ease",
+                background: "transparent",
+                border: "none",
               }}
             >
-              🎥 Movies
+              Movies
+              {location.pathname.startsWith("/movies") && (
+                <span
+                  style={{
+                    position: "absolute",
+                    bottom: "0",
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    width: "20px",
+                    height: "2px",
+                    background: "#e50914",
+                    borderRadius: "2px",
+                  }}
+                />
+              )}
             </Nav.Link>
+
+            {/* Bookings Link - Only show when logged in */}
+            {isLoggedIn && (
+              <Nav.Link
+                as={Link}
+                to="/bookings"
+                className="px-2 py-2 position-relative"
+                style={{
+                  color: "#fff",
+                  fontWeight: 500,
+                  fontSize: "15px",
+                  letterSpacing: "0.3px",
+                  transition: "all 0.3s ease",
+                  background: "transparent",
+                  border: "none",
+                }}
+              >
+                Bookings
+                {location.pathname === "/bookings" && (
+                  <span
+                    style={{
+                      position: "absolute",
+                      bottom: "0",
+                      left: "50%",
+                      transform: "translateX(-50%)",
+                      width: "20px",
+                      height: "2px",
+                      background: "#e50914",
+                      borderRadius: "2px",
+                    }}
+                  />
+                )}
+              </Nav.Link>
+            )}
+          </Nav>
+
+          {/* Right Side - Auth */}
+          <Nav className="gap-2 align-items-center">
+            {/* Auth Buttons */}
+            {isLoggedIn ? (
+              <>
+                <span
+                  className="px-3 py-2"
+                  style={{
+                    color: "rgba(255,255,255,0.7)",
+                    fontSize: "14px",
+                  }}
+                >
+                  {userName}
+                </span>
+                <Button
+                  variant="outline-light"
+                  className="px-3 py-2 rounded-pill fw-semibold"
+                  onClick={handleLogout}
+                  style={{
+                    borderColor: "rgba(255,255,255,0.2)",
+                    fontSize: "14px",
+                    transition: "all 0.3s ease",
+                  }}
+                >
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Nav.Link
+                  as={Link}
+                  to="/login"
+                  className="px-3 py-2"
+                  style={{
+                    color: "rgba(255,255,255,0.8)",
+                    fontSize: "14px",
+                    fontWeight: 500,
+                    transition: "all 0.3s ease",
+                  }}
+                >
+                  Sign In
+                </Nav.Link>
+                <Button
+                  as={Link as any}
+                  to="/signup"
+                  className="px-4 py-2 rounded-pill fw-semibold border-0"
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #e50914 0%, #b20710 100%)",
+                    fontSize: "14px",
+                    transition: "all 0.3s ease",
+                  }}
+                >
+                  Sign Up
+                </Button>
+              </>
+            )}
           </Nav>
         </BSNavbar.Collapse>
       </Container>

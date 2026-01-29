@@ -107,6 +107,14 @@ const MovieDetailsPage = () => {
   };
 
   const handleShowSelect = (show: Show) => {
+    // Check if user is logged in
+    const token = localStorage.getItem("token");
+    if (!token) {
+      // Redirect to login page if not logged in
+      navigate("/login");
+      return;
+    }
+
     setSelectedShow(show);
     setShowBookingModal(true);
   };

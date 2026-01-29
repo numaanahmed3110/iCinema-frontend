@@ -20,6 +20,13 @@ export const API_CONFIG = {
     RATING: {
       RATE: "/api/rating/rate",
     },
+    AUTH: {
+      LOGIN: "/api/auth/login",
+      SIGNUP: "/api/auth/signup",
+    },
+    BOOKING: {
+      HISTORY: "/api/booking/history",
+    },
   },
 };
 

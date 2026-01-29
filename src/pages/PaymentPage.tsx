@@ -49,6 +49,13 @@ const PaymentPage = () => {
     setLoading(true);
     setError("");
 
+    // Check if user is logged in
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
     const discount = method === "CREDIT" ? 0.1 : 0.05;
     const discountAmount = pricing.totalAmount * discount;
     const finalAmount = pricing.totalAmount - discountAmount;
@@ -64,7 +71,11 @@ const PaymentPage = () => {
     };
 
     axios
-      .post("http://localhost:8080/api/payment/pay", paymentData)
+      .post("http://localhost:8080/api/payment/pay", paymentData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
       .then((res) => {
         const ticket: Ticket = {
           ticketId: res.data.transactionId || `TKT${Date.now()}`,
